@@ -15,6 +15,16 @@ A modern GNOME Shell extension that provides a native Bikram Sambat (BS) Nepali 
 - **Native GNOME Theme Fidelity**: Seamlessly adapts to light, dark, and custom themes (e.g., Catppuccin, Adwaita) and respects system accent colors.
 - **Libadwaita Preferences**: Modern settings window for customizing display format, panel position (`Left`, `Center`, `Right`), and feature toggles.
 
+## Planned Features
+
+- [ ] **English / Nepali Language & Script Toggle**: Option to toggle month and weekday names between Devanagari script (e.g. `कार्तिक`, `आइतबार`) and Romanized English (e.g. `Kartik`, `Sunday`).
+- [ ] **Quick Copy Date to Clipboard**: Click on the date tile to copy today's formatted Nepali date (e.g. `२०८१-०७-०७` or `७ कार्तिक २०८१`) directly to clipboard.
+- [ ] **Upcoming Holidays & Festivals Preview**: Advance preview of public holidays and festivals coming up in the next 7–14 days.
+- [ ] **Built-in BS ⟷ AD Date Converter Tool**: Integrated date conversion page inside the Libadwaita Preferences window for quick two-way Bikram Sambat and Gregorian conversion.
+- [ ] **Holiday Morning Notifications**: Optional morning desktop notifications for official public holidays and major festivals.
+- [ ] **Lunar Phase Symbolic Icons**: Dynamic moon phase symbolic icons (Purnima 🌕, Aunsi 🌑, etc.) displayed alongside the lunar Tithi badge.
+- [ ] **Extended Year Range Coverage**: Expansion of the calendar dataset beyond BS 2085.
+
 ## Installation
 
 ### Manual Installation
