@@ -4,6 +4,10 @@ A modern GNOME Shell extension that provides a native Bikram Sambat (BS) Nepali 
 
 > **Note**: This project is a modernized fork of [PublisherName/nepali-calendar-gs-extension](https://github.com/PublisherName/nepali-calendar-gs-extension) originally created by **Subash Ghimire** ([@PublisherName](https://github.com/PublisherName)).
 
+<p align="center">
+  <img src="assets/screenshot.png" alt="Nepali Calendar GNOME Extension Preview" width="540">
+</p>
+
 ## Features
 
 - **Libadwaita Hero Card Popup**: Clean, modern popover featuring an accent-styled date tile, weekday, Gregorian full date, lunar Tithi badge, public holiday indicator (`सार्वजनिक बिदा`), and upcoming festivals list.
