@@ -1,9 +1,4 @@
-import {
-  readJsonFileAsync,
-  convertToNepaliNumber,
-  formatNumberBySystem,
-  padZero,
-} from './Helper.js';
+import { readJsonFileAsync, formatNumberBySystem } from './Helper.js';
 
 export const MIN_SUPPORTED_YEAR = 2081;
 export const MAX_SUPPORTED_YEAR = 2085;
@@ -31,36 +26,6 @@ export const NEPALI_WEEKDAYS = [
   'बिहीबार',
   'शुक्रबार',
   'शनिबार',
-];
-
-export const NEPALI_WEEKDAYS_SHORT = [
-  'आइत',
-  'सोम',
-  'मङ्गल',
-  'बुध',
-  'बिही',
-  'शुक्र',
-  'शनि',
-];
-
-export const ENGLISH_WEEKDAYS = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-];
-
-export const ENGLISH_WEEKDAYS_SHORT = [
-  'Sun',
-  'Mon',
-  'Tue',
-  'Wed',
-  'Thu',
-  'Fri',
-  'Sat',
 ];
 
 export const nepaliCalendarData = {

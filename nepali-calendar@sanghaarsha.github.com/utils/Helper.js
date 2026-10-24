@@ -45,8 +45,3 @@ export const formatNumberBySystem = (number, numeralSystem = 'nepali') => {
   }
   return convertToNepaliNumber(number);
 };
-
-export const padZero = (num, length = 2, numeralSystem = 'nepali') => {
-  const str = num.toString().padStart(length, '0');
-  return formatNumberBySystem(str, numeralSystem);
-};

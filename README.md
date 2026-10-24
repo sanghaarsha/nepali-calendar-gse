@@ -1,17 +1,19 @@
-# Nepali Calendar GNOME Shell Extension (`nepali-calendar-gse`)
+# Nepali Calendar GNOME Shell Extension (`nepali-calendar@sanghaarsha.github.com`)
 
-A modern GNOME Shell extension that provides a native Bikram Sambat (BS) Nepali calendar in the top panel with a sleek modern popup card, dual English/Nepali dates, holiday and weekend highlights, and lunar Tithi details.
+A modern GNOME Shell extension that provides a native Bikram Sambat (BS) Nepali calendar in the top panel with a Libadwaita hero card popup, dual English/Nepali dates, holiday and weekend highlights, and lunar Tithi details.
 
 > **Note**: This project is a modernized fork of [PublisherName/nepali-calendar-gs-extension](https://github.com/PublisherName/nepali-calendar-gs-extension) originally created by **Subash Ghimire** ([@PublisherName](https://github.com/PublisherName)).
 
 ## Features
 
-- **Modern Compact Popup Card**: Clean, sleek popup displaying the current Nepali date, weekday, Gregorian equivalent, lunar Tithi, and upcoming festivals.
-- **Dual-Date Display**: Shows both Bikram Sambat date and Gregorian English date.
-- **Native GNOME Theme Fidelity**: Seamlessly adapts to light, dark, and custom themes (e.g., Catppuccin, Adwaita) and respects accent colors.
-- **Today & Events Card**: Displays full Nepali/English date, circular day badge, lunar Tithi pill, public holiday badge (`सार्वजनिक बिदा`), and a list of festivals/events.
-- **Configurable Top Panel**: Full, medium, or date-only formats, with numeral style options (Nepali ०-९ or English 0-9).
-- **Libadwaita Preferences**: Modern settings window for customizing display, panel position, and calendar features.
+- **Libadwaita Hero Card Popup**: Clean, modern popover featuring an accent-styled date tile, weekday, Gregorian full date, lunar Tithi badge, public holiday indicator (`सार्वजनिक बिदा`), and upcoming festivals list.
+- **Configurable Top Panel Indicator**: Supports `Full` (e.g. `७ कार्तिक (शनिबार)`), `Medium` (`७ कार्तिक`), or `Date Only` (`७`) formats, with optional calendar icon and year display.
+- **Customizable Numeral Systems**: Seamlessly switch between Devanagari numerals (`०, १, २, ३...`) and Western digits (`0, 1, 2, 3...`) across the top panel and popup card.
+- **Dual-Date Display**: Shows both Bikram Sambat (BS) and Gregorian (AD) calendar dates.
+- **Holiday & Weekend Highlights**: Highlights official public holidays and Saturdays in both the top bar and popup card.
+- **Lunar Tithi & Festivals**: Displays the current lunar Tithi and Nepali cultural festivals/events.
+- **Native GNOME Theme Fidelity**: Seamlessly adapts to light, dark, and custom themes (e.g., Catppuccin, Adwaita) and respects system accent colors.
+- **Libadwaita Preferences**: Modern settings window for customizing display format, panel position (`Left`, `Center`, `Right`), and feature toggles.
 
 ## Installation
 
