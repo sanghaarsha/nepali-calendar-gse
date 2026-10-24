@@ -66,75 +66,96 @@ const Indicator = GObject.registerClass(
       this._popupContainer = new St.BoxLayout({
         orientation: Clutter.Orientation.VERTICAL,
         style_class: 'np-cal-popup-container',
-        x_align: Clutter.ActorAlign.CENTER,
       });
 
-      // 1. Header: Nepali Year and Month + Holiday Badge
-      const headerBox = new St.BoxLayout({
-        orientation: Clutter.Orientation.HORIZONTAL,
-        style_class: 'np-cal-popup-header',
-        y_align: Clutter.ActorAlign.CENTER,
-        x_align: Clutter.ActorAlign.CENTER,
-      });
-
+      // 1. Header: Nepali Year and Month (stably centered)
       this._yearMonthLabel = new St.Label({
         text: '',
         style_class: 'np-cal-year-month-label',
+        x_align: Clutter.ActorAlign.CENTER,
       });
-      headerBox.add_child(this._yearMonthLabel);
+      this._popupContainer.add_child(this._yearMonthLabel);
 
-      this._holidayBadge = new St.Label({
-        text: _('सार्वजनिक बिदा'),
-        style_class: 'np-cal-badge np-cal-holiday-badge',
+      // 2. Libadwaita Hero Card
+      this._heroCard = new St.BoxLayout({
+        orientation: Clutter.Orientation.HORIZONTAL,
+        style_class: 'np-cal-hero-card',
+        y_align: Clutter.ActorAlign.CENTER,
       });
-      headerBox.add_child(this._holidayBadge);
-      this._popupContainer.add_child(headerBox);
 
-      // 2. Day & Date in Circle Badge
-      const dayDateContainer = new St.BoxLayout({
-        style_class: 'np-cal-day-date-circle',
+      // Left: Date Tile
+      this._dateTileBox = new St.BoxLayout({
+        style_class: 'np-cal-date-tile',
         orientation: Clutter.Orientation.VERTICAL,
         x_align: Clutter.ActorAlign.CENTER,
         y_align: Clutter.ActorAlign.CENTER,
       });
 
-      this._dayLabel = new St.Label({
-        text: '',
-        style_class: 'np-cal-day-label',
-      });
       this._dateLabel = new St.Label({
         text: '',
-        style_class: 'np-cal-date-label',
+        style_class: 'np-cal-date-tile-number',
+        x_align: Clutter.ActorAlign.CENTER,
+        y_align: Clutter.ActorAlign.CENTER,
       });
-      dayDateContainer.add_child(this._dayLabel);
-      dayDateContainer.add_child(this._dateLabel);
-      this._popupContainer.add_child(dayDateContainer);
+      this._dateTileBox.add_child(this._dateLabel);
+      this._heroCard.add_child(this._dateTileBox);
 
-      // 3. Gregorian English Full Date
+      // Right: Details Column
+      const detailsCol = new St.BoxLayout({
+        orientation: Clutter.Orientation.VERTICAL,
+        style_class: 'np-cal-details-col',
+        y_align: Clutter.ActorAlign.CENTER,
+        x_expand: true,
+      });
+
+      // Weekday
+      this._dayLabel = new St.Label({
+        text: '',
+        style_class: 'np-cal-weekday-label',
+      });
+      detailsCol.add_child(this._dayLabel);
+
+      // Gregorian English Date
       this._englishDateLabel = new St.Label({
         text: '',
         style_class: 'dim-label np-cal-english-date-label',
       });
-      this._popupContainer.add_child(this._englishDateLabel);
+      detailsCol.add_child(this._englishDateLabel);
 
-      // 4. Lunar Tithi Badge
+      // Status Badges Row (Holiday & Tithi)
+      const statusRow = new St.BoxLayout({
+        orientation: Clutter.Orientation.HORIZONTAL,
+        style_class: 'np-cal-status-row',
+        y_align: Clutter.ActorAlign.CENTER,
+      });
+
+      this._holidayBadge = new St.Label({
+        text: _('सार्वजनिक बिदा'),
+        style_class: 'np-cal-badge np-cal-holiday-pill',
+      });
+      statusRow.add_child(this._holidayBadge);
+
       this._tithiBadge = new St.Label({
         text: '',
-        style_class: 'np-cal-badge np-cal-tithi-badge',
+        style_class: 'np-cal-badge np-cal-tithi-pill',
       });
-      this._popupContainer.add_child(this._tithiBadge);
+      statusRow.add_child(this._tithiBadge);
 
-      // 5. Divider
+      detailsCol.add_child(statusRow);
+      this._heroCard.add_child(detailsCol);
+
+      this._popupContainer.add_child(this._heroCard);
+
+      // 3. Subtle Divider
       this._divider = new St.Widget({
         style_class: 'np-cal-popup-divider',
       });
       this._popupContainer.add_child(this._divider);
 
-      // 6. Events / Festivals Container
+      // 4. Events / Festivals Container
       this._eventsContainer = new St.BoxLayout({
         orientation: Clutter.Orientation.VERTICAL,
         style_class: 'np-cal-events-container',
-        x_align: Clutter.ActorAlign.CENTER,
       });
       this._popupContainer.add_child(this._eventsContainer);
 
@@ -191,25 +212,24 @@ const Indicator = GObject.registerClass(
         `${formatted.nepaliYear} ${formatted.nepaliMonth}`
       );
 
-      // Holiday Badge (public holiday or Saturday)
+      // Holiday status (public holiday or Saturday)
       const isSaturday = today.nepaliDayOfWeek === 7;
-      if (highlightHolidays && (formatted.isHoliday || isSaturday)) {
+      const isHolidayToday =
+        highlightHolidays && (formatted.isHoliday || isSaturday);
+
+      if (isHolidayToday) {
         this._holidayBadge.visible = true;
+        this._dayLabel.add_style_class_name('np-cal-holiday-text');
+        this._dateTileBox.add_style_class_name('np-cal-date-tile-holiday');
       } else {
         this._holidayBadge.visible = false;
+        this._dayLabel.remove_style_class_name('np-cal-holiday-text');
+        this._dateTileBox.remove_style_class_name('np-cal-date-tile-holiday');
       }
 
-      // 2. Day & Date in circle
+      // 2. Day & Date
       this._dayLabel.set_text(formatted.nepaliDayOfWeek);
       this._dateLabel.set_text(formatted.nepaliDay);
-
-      if (highlightHolidays && (formatted.isHoliday || isSaturday)) {
-        this._dayLabel.add_style_class_name('np-cal-holiday-text');
-        this._dateLabel.add_style_class_name('np-cal-holiday-text');
-      } else {
-        this._dayLabel.remove_style_class_name('np-cal-holiday-text');
-        this._dateLabel.remove_style_class_name('np-cal-holiday-text');
-      }
 
       // 3. Gregorian English Date
       if (showEnglish) {
