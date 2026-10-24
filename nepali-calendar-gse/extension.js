@@ -2,53 +2,102 @@ import GObject from 'gi://GObject';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
+import Pango from 'gi://Pango';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import {
   Extension,
-  gettext as _, // eslint-disable-line no-unused-vars
+  gettext as _,
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import {
-  formatNepaliDateData,
   getCurrentNepaliDate,
   preloadYearData,
+  formatNepaliDateData,
+  formatTopBarText,
 } from './utils/NepaliDateConverter.js';
 
 const Indicator = GObject.registerClass(
   class Indicator extends PanelMenu.Button {
-    _init() {
-      super._init(0.0, 'Nepali Date Extension');
+    _init(settings) {
+      super._init(0.5, 'Nepali Calendar');
+      this._settings = settings;
       this._updateTimeout = null;
+      this._dailyUpdateTimeout = null;
+
+      // Top bar panel box
       this._box = new St.BoxLayout({
-        style_class: 'np-cal-panel-status-menu-box',
+        style_class: 'panel-status-menu-box np-cal-panel-box',
+        y_align: Clutter.ActorAlign.CENTER,
       });
+
+      this._icon = new St.Icon({
+        icon_name: 'x-office-calendar-symbolic',
+        style_class: 'system-status-icon np-cal-panel-icon',
+      });
+      this._box.add_child(this._icon);
+
       this._nepaliDateLabel = new St.Label({
         text: '',
         y_align: Clutter.ActorAlign.CENTER,
         style_class: 'np-cal-top-bar-date-label',
       });
       this._box.add_child(this._nepaliDateLabel);
+
       this.add_child(this._box);
+
       this._createPopupMenu();
-      this._updateLabel();
+      this.updateSettings();
+      this._scheduleMidnightUpdate();
+
+      this.menu.connectObject(
+        'open-state-changed',
+        (menu, isOpen) => {
+          if (isOpen) {
+            this.updatePopup();
+          }
+        },
+        this
+      );
     }
 
     _createPopupMenu() {
-      const popupContainer = new St.BoxLayout({
+      this._popupContainer = new St.BoxLayout({
         orientation: Clutter.Orientation.VERTICAL,
-        style_class: 'np-cal-custom-popup-container',
+        style_class: 'np-cal-popup-container',
+        x_align: Clutter.ActorAlign.CENTER,
       });
+
+      // 1. Header: Nepali Year and Month + Holiday Badge
+      const headerBox = new St.BoxLayout({
+        orientation: Clutter.Orientation.HORIZONTAL,
+        style_class: 'np-cal-popup-header',
+        y_align: Clutter.ActorAlign.CENTER,
+        x_align: Clutter.ActorAlign.CENTER,
+      });
+
       this._yearMonthLabel = new St.Label({
         text: '',
         style_class: 'np-cal-year-month-label',
       });
+      headerBox.add_child(this._yearMonthLabel);
+
+      this._holidayBadge = new St.Label({
+        text: _('सार्वजनिक बिदा'),
+        style_class: 'np-cal-badge np-cal-holiday-badge',
+      });
+      headerBox.add_child(this._holidayBadge);
+      this._popupContainer.add_child(headerBox);
+
+      // 2. Day & Date in Circle Badge
       const dayDateContainer = new St.BoxLayout({
         style_class: 'np-cal-day-date-circle',
         orientation: Clutter.Orientation.VERTICAL,
         x_align: Clutter.ActorAlign.CENTER,
+        y_align: Clutter.ActorAlign.CENTER,
       });
+
       this._dayLabel = new St.Label({
         text: '',
         style_class: 'np-cal-day-label',
@@ -59,74 +108,195 @@ const Indicator = GObject.registerClass(
       });
       dayDateContainer.add_child(this._dayLabel);
       dayDateContainer.add_child(this._dateLabel);
+      this._popupContainer.add_child(dayDateContainer);
+
+      // 3. Gregorian English Full Date
       this._englishDateLabel = new St.Label({
         text: '',
-        style_class: 'np-cal-english-date-label',
+        style_class: 'dim-label np-cal-english-date-label',
       });
-      this._tithiLabel = new St.Label({
-        text: '',
-        style_class: 'np-cal-tithi-label',
-      });
-      this._eventLabel = new St.Label({
-        text: '',
-        style_class: 'np-cal-event-label',
-      });
+      this._popupContainer.add_child(this._englishDateLabel);
 
-      popupContainer.add_child(this._yearMonthLabel);
-      popupContainer.add_child(dayDateContainer);
-      popupContainer.add_child(this._englishDateLabel);
-      popupContainer.add_child(this._tithiLabel);
-      popupContainer.add_child(this._eventLabel);
+      // 4. Lunar Tithi Badge
+      this._tithiBadge = new St.Label({
+        text: '',
+        style_class: 'np-cal-badge np-cal-tithi-badge',
+      });
+      this._popupContainer.add_child(this._tithiBadge);
 
+      // 5. Divider
+      this._divider = new St.Widget({
+        style_class: 'np-cal-popup-divider',
+      });
+      this._popupContainer.add_child(this._divider);
+
+      // 6. Events / Festivals Container
+      this._eventsContainer = new St.BoxLayout({
+        orientation: Clutter.Orientation.VERTICAL,
+        style_class: 'np-cal-events-container',
+        x_align: Clutter.ActorAlign.CENTER,
+      });
+      this._popupContainer.add_child(this._eventsContainer);
+
+      // Wrap container in PopupBaseMenuItem
       const customItem = new PopupMenu.PopupBaseMenuItem({
         reactive: false,
+        can_focus: false,
+        activate: false,
       });
       customItem.add_style_class_name('np-cal-custom-popup-item');
-      customItem.add_child(popupContainer);
+      customItem.add_child(this._popupContainer);
+
       this.menu.addMenuItem(customItem);
     }
 
-    _updateLabel() {
-      const nepaliDateInfo = formatNepaliDateData(getCurrentNepaliDate());
-      this._nepaliDateLabel.set_text(
-        `${nepaliDateInfo.nepaliDay} ${nepaliDateInfo.nepaliMonth} (${nepaliDateInfo.nepaliDayOfWeek})`
-      );
+    updateSettings() {
+      const showIcon = this._settings
+        ? this._settings.get_boolean('show-icon')
+        : false;
+      this._icon.visible = showIcon;
 
+      this.updateLabel();
+      this.updatePopup();
+    }
+
+    updateLabel() {
+      const today = getCurrentNepaliDate();
+      const text = formatTopBarText(today, this._settings);
+      this._nepaliDateLabel.set_text(text);
+    }
+
+    updatePopup() {
+      const today = getCurrentNepaliDate();
+      const numeralSystem = this._settings
+        ? this._settings.get_string('numeral-system')
+        : 'nepali';
+      const showEnglish = this._settings
+        ? this._settings.get_boolean('show-english-dates')
+        : true;
+      const showTithi = this._settings
+        ? this._settings.get_boolean('show-tithi')
+        : true;
+      const highlightHolidays = this._settings
+        ? this._settings.get_boolean('highlight-holidays')
+        : true;
+      const showEvents = this._settings
+        ? this._settings.get_boolean('show-events')
+        : true;
+
+      const formatted = formatNepaliDateData(today, numeralSystem);
+
+      // 1. Year and Month
       this._yearMonthLabel.set_text(
-        `${nepaliDateInfo.nepaliYear} ${nepaliDateInfo.nepaliMonth}`
-      );
-      this._dayLabel.set_text(nepaliDateInfo.nepaliDayOfWeek);
-      this._dateLabel.set_text(nepaliDateInfo.nepaliDay);
-      this._englishDateLabel.set_text(nepaliDateInfo.englishDate);
-      this._tithiLabel.set_text(nepaliDateInfo.nepaliTithi);
-      this._eventLabel.set_text(
-        nepaliDateInfo.nepaliEvent.split('/').join('\n')
+        `${formatted.nepaliYear} ${formatted.nepaliMonth}`
       );
 
-      this._scheduleMidnightUpdate();
+      // Holiday Badge (public holiday or Saturday)
+      const isSaturday = today.nepaliDayOfWeek === 7;
+      if (highlightHolidays && (formatted.isHoliday || isSaturday)) {
+        this._holidayBadge.visible = true;
+      } else {
+        this._holidayBadge.visible = false;
+      }
+
+      // 2. Day & Date in circle
+      this._dayLabel.set_text(formatted.nepaliDayOfWeek);
+      this._dateLabel.set_text(formatted.nepaliDay);
+
+      if (highlightHolidays && (formatted.isHoliday || isSaturday)) {
+        this._dayLabel.add_style_class_name('np-cal-holiday-text');
+        this._dateLabel.add_style_class_name('np-cal-holiday-text');
+      } else {
+        this._dayLabel.remove_style_class_name('np-cal-holiday-text');
+        this._dateLabel.remove_style_class_name('np-cal-holiday-text');
+      }
+
+      // 3. Gregorian English Date
+      if (showEnglish) {
+        this._englishDateLabel.set_text(formatted.englishFullDate);
+        this._englishDateLabel.visible = true;
+      } else {
+        this._englishDateLabel.visible = false;
+      }
+
+      // 4. Lunar Tithi
+      if (showTithi && formatted.nepaliTithi && formatted.nepaliTithi !== '-') {
+        this._tithiBadge.set_text(formatted.nepaliTithi);
+        this._tithiBadge.visible = true;
+      } else {
+        this._tithiBadge.visible = false;
+      }
+
+      // 5. Events / Festivals
+      this._eventsContainer.destroy_all_children();
+      const rawEvents = formatted.nepaliEvent;
+      const hasEvents = rawEvents && rawEvents !== '-' && rawEvents !== '--';
+
+      if (showEvents && hasEvents) {
+        this._divider.visible = true;
+        this._eventsContainer.visible = true;
+
+        const eventList = rawEvents
+          .split('/')
+          .map((e) => e.trim())
+          .filter((e) => e.length > 0);
+
+        eventList.forEach((eventName) => {
+          const row = new St.BoxLayout({
+            orientation: Clutter.Orientation.HORIZONTAL,
+            style_class: 'np-cal-event-row',
+            y_align: Clutter.ActorAlign.CENTER,
+            x_align: Clutter.ActorAlign.CENTER,
+          });
+
+          const icon = new St.Icon({
+            icon_name: 'emblem-favorite-symbolic',
+            icon_size: 14,
+            style_class: 'np-cal-event-icon',
+          });
+          const label = new St.Label({
+            text: eventName,
+            style_class: 'np-cal-event-label',
+          });
+          label.clutter_text.line_wrap = true;
+          label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+
+          row.add_child(icon);
+          row.add_child(label);
+          this._eventsContainer.add_child(row);
+        });
+      } else {
+        this._divider.visible = false;
+        this._eventsContainer.visible = false;
+      }
     }
 
     _scheduleMidnightUpdate() {
       const SECONDS_PER_DAY = 86400;
       const now = new Date();
       const midnight = new Date();
-      midnight.setHours(24, 0, 0, 0);
-      const timeUntilMidnight = (midnight - now) / 1000;
+      midnight.setHours(24, 0, 1, 0); // 1 second past midnight
+      const timeUntilMidnight = Math.max(1, (midnight - now) / 1000);
 
       if (this._updateTimeout) {
         GLib.source_remove(this._updateTimeout);
+        this._updateTimeout = null;
       }
+
       try {
         this._updateTimeout = GLib.timeout_add_seconds(
           GLib.PRIORITY_DEFAULT,
           timeUntilMidnight,
           () => {
-            this._updateLabel();
+            this.updateLabel();
+            this.updatePopup();
+
             this._dailyUpdateTimeout = GLib.timeout_add_seconds(
               GLib.PRIORITY_DEFAULT,
               SECONDS_PER_DAY,
               () => {
-                this._updateLabel();
+                this.updateLabel();
+                this.updatePopup();
                 return GLib.SOURCE_CONTINUE;
               }
             );
@@ -135,7 +305,7 @@ const Indicator = GObject.registerClass(
         );
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Failed to setup update timer:', error);
+        console.error('Failed to setup midnight update timer:', error);
       }
     }
 
@@ -158,8 +328,9 @@ const Indicator = GObject.registerClass(
 export default class NepaliCalendar extends Extension {
   constructor(metadata) {
     super(metadata);
-    this._extension = null;
-    this._positionChangedId = null;
+    this._indicator = null;
+    this._settings = null;
+    this._settingsSignalIds = [];
   }
 
   async enable() {
@@ -173,64 +344,70 @@ export default class NepaliCalendar extends Extension {
         return;
       }
 
-      this._extension = new Indicator();
-      this._addToPanel(position);
+      this._indicator = new Indicator(this._settings);
+      Main.panel.addToStatusArea(this.uuid, this._indicator, 1, position);
+
+      this._listenToSettings();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to enable Nepali Calendar extension:', error);
     }
-
-    this._positionChangedId = this._settings.connect(
-      'changed::menu-position',
-      () => {
-        const newPosition = this._settings.get_string('menu-position');
-        this._moveIndicator(newPosition);
-      }
-    );
   }
 
-  disable() {
-    if (this._positionChangedId) {
-      this._settings.disconnect(this._positionChangedId);
-      this._positionChangedId = null;
+  _listenToSettings() {
+    if (!this._settings) {
+      return;
     }
 
-    if (this._settings) {
-      this._settings = null;
-    }
+    const posId = this._settings.connect('changed::menu-position', () => {
+      const newPosition = this._settings.get_string('menu-position');
+      this._moveIndicator(newPosition);
+    });
+    this._settingsSignalIds.push(posId);
 
-    if (this._extension) {
-      this._removeFromPanel();
-      this._extension.destroy();
-      this._extension = null;
-    }
+    const settingKeys = [
+      'top-bar-format',
+      'show-day-of-week',
+      'show-year',
+      'numeral-system',
+      'show-icon',
+      'show-english-dates',
+      'highlight-holidays',
+      'show-tithi',
+      'show-events',
+    ];
+
+    settingKeys.forEach((key) => {
+      const id = this._settings.connect(`changed::${key}`, () => {
+        if (this._indicator) {
+          this._indicator.updateSettings();
+        }
+      });
+      this._settingsSignalIds.push(id);
+    });
   }
 
   _moveIndicator(newPosition) {
-    if (!this._extension) {
+    if (!this._indicator) {
       return;
     }
-    this._removeFromPanel();
-    this._addToPanel(newPosition);
+    this._indicator.destroy();
+    this._indicator = new Indicator(this._settings);
+    Main.panel.addToStatusArea(this.uuid, this._indicator, 1, newPosition);
   }
 
-  _removeFromPanel() {
-    if (!this._extension) {
-      return;
+  disable() {
+    if (this._settings) {
+      this._settingsSignalIds.forEach((id) => {
+        this._settings.disconnect(id);
+      });
+      this._settingsSignalIds = [];
+      this._settings = null;
     }
-    const { container, menu } = this._extension;
-    container?.get_parent()?.remove_child(container);
-    Main.panel.menuManager.removeMenu(menu);
-  }
 
-  _addToPanel(position) {
-    const positionMap = {
-      left: Main.panel._leftBox,
-      center: Main.panel._centerBox,
-      right: Main.panel._rightBox,
-    };
-
-    const panelPosition = positionMap[position] || Main.panel._centerBox;
-    panelPosition.insert_child_at_index(this._extension.container, -1);
-    Main.panel.menuManager.addMenu(this._extension.menu);
+    if (this._indicator) {
+      this._indicator.destroy();
+      this._indicator = null;
+    }
   }
 }

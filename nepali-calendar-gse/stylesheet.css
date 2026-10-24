@@ -1,81 +1,116 @@
-/* Top bar label styling */
+/* Top Bar Panel Styling */
+.np-cal-panel-box {
+  spacing: 6px;
+}
+
+.np-cal-panel-icon {
+  icon-size: 16px;
+}
+
 .np-cal-top-bar-date-label {
-    font-size: 14px;
-    font-weight: bold;
-    color: #ffffff;
-    /*background-color: #333;*/
-    padding: 0 5px;
-    margin: 0 8px;
+  font-weight: bold;
 }
 
-/* Style for year and month at the top of popup */
+/* Custom Popup Item Wrapper */
+.np-cal-custom-popup-item,
+.np-cal-custom-popup-item.popup-menu-item {
+  padding: 0 !important;
+  background-color: transparent !important;
+}
+
+/* Modern Popup Container */
+.np-cal-popup-container {
+  padding: 14px 18px;
+  width: 250px;
+  spacing: 8px;
+}
+
+/* Header Row: Nepali Year & Month + Holiday Badge */
+.np-cal-popup-header {
+  spacing: 8px;
+}
+
 .np-cal-year-month-label {
-    font-size: 16px;
-    font-weight: bold;
-    color: #c94114;
-    /* Primary color for year and month */
-    margin-bottom: 8px;
-    text-align: center;
+  font-weight: bold;
+  font-size: 1.15em;
+  text-align: center;
 }
 
-/* Circle container for the day and date */
+/* General Badges */
+.np-cal-badge {
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.78em;
+  font-weight: bold;
+}
+
+.np-cal-holiday-badge {
+  background-color: rgba(237, 135, 150, 0.2);
+  color: #ed8796;
+}
+
+/* Circular Day & Date Badge */
 .np-cal-day-date-circle {
-    background-color: #ffffff;
-    /* Neutral color for the circle */
-    color: #000000b6;
-    border-radius: 60px;
-    padding: 15px;
-    width: 60px;
-    height: 60px;
-    margin: 5px;
-    align-items: center;
-    justify-content: center;
-}
-
-.np-cal-date-label {
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    color: #333;
+  width: 76px;
+  height: 76px;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.08);
+  margin: 4px 0;
+  padding: 6px;
 }
 
 .np-cal-day-label {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    color: #333;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-align: center;
 }
 
-/* Style for the English full date */
+.np-cal-date-label {
+  font-size: 1.85em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.np-cal-holiday-text {
+  color: #ed8796;
+}
+
+/* Gregorian English Full Date */
 .np-cal-english-date-label {
-    font-size: 14px;
-    color: #ffffff;
-    text-align: center;
-    margin: 8px 0;
+  font-size: 0.86em;
+  text-align: center;
 }
 
-/* Style for Tithi and Event labels */
-.np-cal-tithi-label,
+/* Lunar Tithi Badge */
+.np-cal-tithi-badge {
+  background-color: rgba(255, 255, 255, 0.1);
+  font-size: 0.82em;
+  text-align: center;
+  margin: 2px 0;
+}
+
+/* Subtle Divider */
+.np-cal-popup-divider {
+  height: 1px;
+  min-height: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+  margin: 6px 0;
+}
+
+/* Events & Festivals List */
+.np-cal-events-container {
+  spacing: 5px;
+}
+
+.np-cal-event-row {
+  spacing: 6px;
+}
+
+.np-cal-event-icon {
+  color: -st-accent-color;
+}
+
 .np-cal-event-label {
-    font-size: 14px;
-    color: #ffffff;
-    text-align: center;
-    margin-top: 4px;
-    white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.np-cal-custom-popup-container {
-    padding: 10px;
-    background-color: #333;
-    color: #ffffff;
-    border-radius: 5px;
-    margin: 2px;
-    width: 200px;
-}
-
-.np-cal-custom-popup-item {
-    background-color: #333;
-    border-radius: 5px;
+  font-size: 0.88em;
+  text-align: center;
 }
