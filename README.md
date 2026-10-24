@@ -33,7 +33,7 @@ A modern GNOME Shell extension that provides a native Bikram Sambat (BS) Nepali 
 
 4. Enable the extension:
    ```bash
-   gnome-extensions enable nepali-calendar-gse
+   gnome-extensions enable nepali-calendar@sanghaarsha.github.com
    ```
 
 ## Development & Packaging
@@ -50,12 +50,12 @@ A modern GNOME Shell extension that provides a native Bikram Sambat (BS) Nepali 
 
 3. Validate with shexli:
    ```bash
-   uv run shexli nepali-calendar-gse.zip
+   uv run shexli nepali-calendar@sanghaarsha.github.com.zip
    ```
 
 4. Open preferences:
    ```bash
-   gnome-extensions prefs nepali-calendar-gse
+   gnome-extensions prefs nepali-calendar@sanghaarsha.github.com
    ```
 
 ## License

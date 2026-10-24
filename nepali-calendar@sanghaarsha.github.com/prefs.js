@@ -210,14 +210,14 @@ export default class NepaliCalendarPreferences extends ExtensionPreferences {
     // Version Row
     const versionRow = new Adw.ActionRow({
       title: _('Version'),
-      subtitle: '17',
+      subtitle: this.metadata?.version ? this.metadata.version.toString() : '17',
     });
     aboutGroup.add(versionRow);
 
     // Extension UUID Row
     const uuidRow = new Adw.ActionRow({
       title: _('Extension UUID'),
-      subtitle: 'nepali-calendar-gse',
+      subtitle: this.metadata?.uuid || 'nepali-calendar@sanghaarsha.github.com',
     });
     aboutGroup.add(uuidRow);
 
