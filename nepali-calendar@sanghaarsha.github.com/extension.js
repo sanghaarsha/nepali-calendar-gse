@@ -270,7 +270,7 @@ const Indicator = GObject.registerClass(
           });
 
           const icon = new St.Icon({
-            icon_name: 'emblem-favorite-symbolic',
+            icon_name: 'starred-symbolic',
             icon_size: 14,
             style_class: 'np-cal-event-icon',
           });
