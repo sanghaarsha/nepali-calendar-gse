@@ -23,21 +23,6 @@ export const NEPALI_MONTHS = [
   'चैत',
 ];
 
-export const NEPALI_MONTHS_EN = [
-  'Baisakh',
-  'Jestha',
-  'Asar',
-  'Shrawan',
-  'Bhadra',
-  'Ashwin',
-  'Kartik',
-  'Mangsir',
-  'Poush',
-  'Magh',
-  'Falgun',
-  'Chaitra',
-];
-
 export const NEPALI_WEEKDAYS = [
   'आइतबार',
   'सोमबार',
@@ -76,21 +61,6 @@ export const ENGLISH_WEEKDAYS_SHORT = [
   'Thu',
   'Fri',
   'Sat',
-];
-
-export const ENGLISH_MONTHS_SHORT = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
 ];
 
 export const nepaliCalendarData = {
@@ -221,52 +191,6 @@ export const gregorianToNepali = (gregDate = new Date()) => {
 
 export const getCurrentNepaliDate = () => {
   return gregorianToNepali(new Date());
-};
-
-// Returns complete month view data for interactive calendar grid
-export const getNepaliMonthView = (year, month) => {
-  const y = Math.min(Math.max(year, MIN_SUPPORTED_YEAR), MAX_SUPPORTED_YEAR);
-  const m = Math.min(Math.max(month, 1), 12);
-  const daysInMonth = nepaliCalendarData[y].monthDays[m - 1];
-
-  const { gregDate: firstGregDate, weekday: startWeekday } = nepaliToGregorian(
-    y,
-    m,
-    1
-  );
-  const { gregDate: lastGregDate } = nepaliToGregorian(y, m, daysInMonth);
-
-  const startMonthStr = ENGLISH_MONTHS_SHORT[firstGregDate.getUTCMonth()];
-  const endMonthStr = ENGLISH_MONTHS_SHORT[lastGregDate.getUTCMonth()];
-  const startYearStr = firstGregDate.getUTCFullYear();
-  const endYearStr = lastGregDate.getUTCFullYear();
-
-  let englishSpan = '';
-  if (startYearStr === endYearStr) {
-    englishSpan =
-      startMonthStr === endMonthStr
-        ? `${startMonthStr} ${startYearStr}`
-        : `${startMonthStr} / ${endMonthStr} ${startYearStr}`;
-  } else {
-    englishSpan = `${startMonthStr} ${startYearStr} / ${endMonthStr} ${endYearStr}`;
-  }
-
-  const yearData = getYearDataFromCache(y);
-  let monthDaysData = [];
-  if (yearData && yearData[m - 1] && yearData[m - 1].days) {
-    monthDaysData = yearData[m - 1].days;
-  }
-
-  return {
-    year: y,
-    month: m,
-    monthName: NEPALI_MONTHS[m - 1],
-    monthNameEn: NEPALI_MONTHS_EN[m - 1],
-    daysInMonth,
-    startWeekday, // 0 = Sunday .. 6 = Saturday
-    englishSpan,
-    days: monthDaysData,
-  };
 };
 
 export const getTithiAndEventForNepaliDate = (nepaliDate) => {
