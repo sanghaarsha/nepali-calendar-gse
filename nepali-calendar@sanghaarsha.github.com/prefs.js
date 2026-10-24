@@ -241,6 +241,26 @@ export default class NepaliCalendarPreferences extends ExtensionPreferences {
     });
     aboutGroup.add(repoRow);
 
+    // Original Author Row
+    const originalAuthorRow = new Adw.ActionRow({
+      title: _('Original Author'),
+      subtitle: 'Subash Ghimire (@PublisherName)',
+      activatable: true,
+    });
+    const authorIcon = new Gtk.Image({
+      icon_name: 'adw-external-link-symbolic',
+      valign: Gtk.Align.CENTER,
+    });
+    originalAuthorRow.add_suffix(authorIcon);
+    originalAuthorRow.connect('activated', () => {
+      Gtk.show_uri(
+        window,
+        'https://github.com/PublisherName',
+        Gdk.CURRENT_TIME
+      );
+    });
+    aboutGroup.add(originalAuthorRow);
+
     // Upstream Credit Row
     const upstreamRow = new Adw.ActionRow({
       title: _('Upstream Project'),

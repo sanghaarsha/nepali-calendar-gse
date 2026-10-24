@@ -2,7 +2,7 @@
 
 A modern GNOME Shell extension that provides a native Bikram Sambat (BS) Nepali calendar in the top panel with a sleek modern popup card, dual English/Nepali dates, holiday and weekend highlights, and lunar Tithi details.
 
-> **Note**: This project is a fork of [PublisherName/nepali-calendar-gs-extension](https://github.com/PublisherName/nepali-calendar-gs-extension) maintained at [sanghaarsha/nepali-calendar-gse](https://github.com/sanghaarsha/nepali-calendar-gse).
+> **Note**: This project is a modernized fork of [PublisherName/nepali-calendar-gs-extension](https://github.com/PublisherName/nepali-calendar-gs-extension) originally created by **Subash Ghimire** ([@PublisherName](https://github.com/PublisherName)).
 
 ## Features
 
@@ -57,6 +57,12 @@ A modern GNOME Shell extension that provides a native Bikram Sambat (BS) Nepali 
    ```bash
    gnome-extensions prefs nepali-calendar@sanghaarsha.github.com
    ```
+
+## Credits & Acknowledgements
+
+- **Original Author**: [Subash Ghimire](https://github.com/PublisherName) ([@PublisherName](https://github.com/PublisherName)) for creating the original [Nepali Calendar GNOME Shell Extension](https://github.com/PublisherName/nepali-calendar-gs-extension) and compiling the Bikram Sambat calendar dataset.
+- **Original Extension**: Available on [extensions.gnome.org (EGO #7490)](https://extensions.gnome.org/extension/7490/nepali-calendar/).
+- **Current Maintainer**: [Sangharsha Dahal](https://github.com/sanghaarsha) ([@sanghaarsha](https://github.com/sanghaarsha)).
 
 ## License
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
