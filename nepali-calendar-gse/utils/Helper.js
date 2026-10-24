@@ -23,10 +23,30 @@ export const readJsonFileAsync = (filePath, extensionPath) => {
   });
 };
 
+const NEPALI_DIGITS = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+
 export const convertToNepaliNumber = (number) => {
+  if (number === null || number === undefined) {
+    return '';
+  }
   return number
     .toString()
     .split('')
-    .map((num) => '०१२३४५६७८९'[num])
+    .map((char) => {
+      const digit = parseInt(char, 10);
+      return !isNaN(digit) ? NEPALI_DIGITS[digit] : char;
+    })
     .join('');
+};
+
+export const formatNumberBySystem = (number, numeralSystem = 'nepali') => {
+  if (numeralSystem === 'english') {
+    return number.toString();
+  }
+  return convertToNepaliNumber(number);
+};
+
+export const padZero = (num, length = 2, numeralSystem = 'nepali') => {
+  const str = num.toString().padStart(length, '0');
+  return formatNumberBySystem(str, numeralSystem);
 };

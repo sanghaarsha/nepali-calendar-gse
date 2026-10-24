@@ -1,4 +1,120 @@
-import { readJsonFileAsync, convertToNepaliNumber } from './Helper.js';
+import {
+  readJsonFileAsync,
+  convertToNepaliNumber,
+  formatNumberBySystem,
+  padZero,
+} from './Helper.js';
+
+export const MIN_SUPPORTED_YEAR = 2081;
+export const MAX_SUPPORTED_YEAR = 2085;
+
+export const NEPALI_MONTHS = [
+  'बैशाख',
+  'जेठ',
+  'असार',
+  'साउन',
+  'भदौ',
+  'असोज',
+  'कार्तिक',
+  'मंसिर',
+  'पुष',
+  'माघ',
+  'फाल्गुन',
+  'चैत',
+];
+
+export const NEPALI_MONTHS_EN = [
+  'Baisakh',
+  'Jestha',
+  'Asar',
+  'Shrawan',
+  'Bhadra',
+  'Ashwin',
+  'Kartik',
+  'Mangsir',
+  'Poush',
+  'Magh',
+  'Falgun',
+  'Chaitra',
+];
+
+export const NEPALI_WEEKDAYS = [
+  'आइतबार',
+  'सोमबार',
+  'मंगलबार',
+  'बुधबार',
+  'बिहीबार',
+  'शुक्रबार',
+  'शनिबार',
+];
+
+export const NEPALI_WEEKDAYS_SHORT = [
+  'आइत',
+  'सोम',
+  'मङ्गल',
+  'बुध',
+  'बिही',
+  'शुक्र',
+  'शनि',
+];
+
+export const ENGLISH_WEEKDAYS = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+];
+
+export const ENGLISH_WEEKDAYS_SHORT = [
+  'Sun',
+  'Mon',
+  'Tue',
+  'Wed',
+  'Thu',
+  'Fri',
+  'Sat',
+];
+
+export const ENGLISH_MONTHS_SHORT = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+export const nepaliCalendarData = {
+  2081: {
+    monthDays: [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+    totalDays: 366,
+  },
+  2082: {
+    monthDays: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    totalDays: 365,
+  },
+  2083: {
+    monthDays: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+    totalDays: 365,
+  },
+  2084: {
+    monthDays: [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30],
+    totalDays: 365,
+  },
+  2085: {
+    monthDays: [31, 32, 31, 32, 30, 31, 30, 30, 29, 30, 30, 30],
+    totalDays: 365,
+  },
+};
 
 const yearDataCache = new Map();
 
@@ -13,62 +129,89 @@ export const preloadYearData = async (extensionPath) => {
   await Promise.all(loadPromises);
 };
 
-const nepaliCalendarData = {
-  81: {
-    monthDays: [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
-    totalDays: 366,
-  },
-  82: {
-    monthDays: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-    totalDays: 365,
-  },
-  83: {
-    monthDays: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
-    totalDays: 365,
-  },
-  84: {
-    monthDays: [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30],
-    totalDays: 365,
-  },
-  85: {
-    monthDays: [31, 32, 31, 32, 30, 31, 30, 30, 29, 30, 30, 30],
-    totalDays: 365,
-  },
-};
-
 export const getYearDataFromCache = (year) => {
-  if (!year || isNaN(year)) {
-    throw new Error('Invalid year parameter');
-  }
-  if (!yearDataCache.has(year)) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `No data found for year ${year} - ensure preloadYearData was called`
-    );
+  const y = parseInt(year, 10);
+  if (!y || isNaN(y)) {
     return null;
   }
-  return yearDataCache.get(year);
+  return yearDataCache.get(y) || null;
 };
 
-export const getCurrentNepaliDate = () => {
-  const currentDateEnglish = new Date();
-  const referenceNepaliDate = [2081, 1, 1];
-  const referenceEnglishDate = new Date(2024, 3, 13);
+// Converts Nepali Date (BS) to Gregorian Date (AD) and weekday index (0=Sun..6=Sat)
+export const nepaliToGregorian = (npYear, npMonth, npDay) => {
+  let totalDays = 0;
+  for (let y = MIN_SUPPORTED_YEAR; y < npYear; y++) {
+    totalDays += nepaliCalendarData[y].totalDays;
+  }
+  for (let m = 1; m < npMonth; m++) {
+    totalDays += nepaliCalendarData[npYear].monthDays[m - 1];
+  }
+  totalDays += npDay - 1;
 
-  const dayDifference = Math.floor(
-    (currentDateEnglish - referenceEnglishDate) / (1000 * 3600 * 24)
+  // Reference: 2081-01-01 BS = 2024-04-13 AD (Saturday, weekday index 6)
+  const refUtc = Date.UTC(2024, 3, 13);
+  const targetUtc = refUtc + totalDays * 86400000;
+  const gregDate = new Date(targetUtc);
+  const weekday = (6 + totalDays) % 7;
+
+  return { gregDate, weekday };
+};
+
+// Converts Gregorian Date to Nepali Date (BS)
+export const gregorianToNepali = (gregDate = new Date()) => {
+  const refUtc = Date.UTC(2024, 3, 13);
+  const targetUtc = Date.UTC(
+    gregDate.getFullYear(),
+    gregDate.getMonth(),
+    gregDate.getDate()
   );
-  const [yearOffset, monthOffset, dayOffset] =
-    calculateNepaliDateDifference(dayDifference);
-  const dateOffset = [yearOffset, monthOffset, dayOffset];
-  const adjustedNepaliDate = adjustNepaliDate(referenceNepaliDate, dateOffset);
+  let diffDays = Math.floor((targetUtc - refUtc) / 86400000);
+
+  if (diffDays < 0) {
+    return {
+      nepaliYear: MIN_SUPPORTED_YEAR,
+      nepaliMonth: 1,
+      nepaliDay: 1,
+      nepaliDayOfWeek: 7,
+    };
+  }
+
+  let y = MIN_SUPPORTED_YEAR;
+  while (y <= MAX_SUPPORTED_YEAR) {
+    const yDays = nepaliCalendarData[y].totalDays;
+    if (diffDays >= yDays) {
+      diffDays -= yDays;
+      y++;
+    } else {
+      break;
+    }
+  }
+
+  if (y > MAX_SUPPORTED_YEAR) {
+    y = MAX_SUPPORTED_YEAR;
+    diffDays = nepaliCalendarData[y].totalDays - 1;
+  }
+
+  let m = 1;
+  while (m <= 12) {
+    const mDays = nepaliCalendarData[y].monthDays[m - 1];
+    if (diffDays >= mDays) {
+      diffDays -= mDays;
+      m++;
+    } else {
+      break;
+    }
+  }
+
+  const d = diffDays + 1;
+  const dayOfWeek = gregDate.getDay() + 1; // 1 = Sun .. 7 = Sat
 
   return {
-    nepaliYear: adjustedNepaliDate[0],
-    nepaliMonth: adjustedNepaliDate[1],
-    nepaliDay: adjustedNepaliDate[2],
-    nepaliDayOfWeek: currentDateEnglish.getDay() + 1,
-    englishDate: currentDateEnglish.toLocaleDateString('en-US', {
+    nepaliYear: y,
+    nepaliMonth: m,
+    nepaliDay: d,
+    nepaliDayOfWeek: dayOfWeek,
+    englishDate: gregDate.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: '2-digit',
@@ -76,37 +219,107 @@ export const getCurrentNepaliDate = () => {
   };
 };
 
-export const formatNepaliDateData = (nepaliDate) => {
-  const nepaliMonths = [
-    'बैशाख',
-    'जेठ',
-    'असार',
-    'साउन',
-    'भदौ',
-    'असोज',
-    'कार्तिक',
-    'मंसिर',
-    'पुष',
-    'माघ',
-    'फाल्गुन',
-    'चैत',
-  ];
-  const nepaliWeekDays = [
-    'आइतबार',
-    'सोमबार',
-    'मंगलबार',
-    'बुधबार',
-    'बिहीबार',
-    'शुक्रबार',
-    'शनिबार',
-  ];
+export const getCurrentNepaliDate = () => {
+  return gregorianToNepali(new Date());
+};
 
-  const formattedYear = convertToNepaliNumber(nepaliDate.nepaliYear);
-  const formattedMonth = nepaliMonths[nepaliDate.nepaliMonth - 1];
-  const formattedDay = convertToNepaliNumber(nepaliDate.nepaliDay);
-  const formattedDayOfWeek = nepaliWeekDays[nepaliDate.nepaliDayOfWeek - 1];
+// Returns complete month view data for interactive calendar grid
+export const getNepaliMonthView = (year, month) => {
+  const y = Math.min(Math.max(year, MIN_SUPPORTED_YEAR), MAX_SUPPORTED_YEAR);
+  const m = Math.min(Math.max(month, 1), 12);
+  const daysInMonth = nepaliCalendarData[y].monthDays[m - 1];
 
-  const { tithi, event } = getTithiAndEventForNepaliDate(nepaliDate);
+  const { gregDate: firstGregDate, weekday: startWeekday } = nepaliToGregorian(
+    y,
+    m,
+    1
+  );
+  const { gregDate: lastGregDate } = nepaliToGregorian(y, m, daysInMonth);
+
+  const startMonthStr = ENGLISH_MONTHS_SHORT[firstGregDate.getUTCMonth()];
+  const endMonthStr = ENGLISH_MONTHS_SHORT[lastGregDate.getUTCMonth()];
+  const startYearStr = firstGregDate.getUTCFullYear();
+  const endYearStr = lastGregDate.getUTCFullYear();
+
+  let englishSpan = '';
+  if (startYearStr === endYearStr) {
+    englishSpan =
+      startMonthStr === endMonthStr
+        ? `${startMonthStr} ${startYearStr}`
+        : `${startMonthStr} / ${endMonthStr} ${startYearStr}`;
+  } else {
+    englishSpan = `${startMonthStr} ${startYearStr} / ${endMonthStr} ${endYearStr}`;
+  }
+
+  const yearData = getYearDataFromCache(y);
+  let monthDaysData = [];
+  if (yearData && yearData[m - 1] && yearData[m - 1].days) {
+    monthDaysData = yearData[m - 1].days;
+  }
+
+  return {
+    year: y,
+    month: m,
+    monthName: NEPALI_MONTHS[m - 1],
+    monthNameEn: NEPALI_MONTHS_EN[m - 1],
+    daysInMonth,
+    startWeekday, // 0 = Sunday .. 6 = Saturday
+    englishSpan,
+    days: monthDaysData,
+  };
+};
+
+export const getTithiAndEventForNepaliDate = (nepaliDate) => {
+  const data = getYearDataFromCache(nepaliDate.nepaliYear);
+  let tithi = '-';
+  let event = '-';
+  let isHoliday = false;
+
+  if (data && data[nepaliDate.nepaliMonth - 1]) {
+    const dayData = data[nepaliDate.nepaliMonth - 1].days.find(
+      (d) => d.dayInEn === nepaliDate.nepaliDay.toString()
+    );
+    if (dayData) {
+      tithi = dayData.tithi || '-';
+      event = dayData.event || '-';
+      isHoliday = !!dayData.isHoliday;
+    }
+  }
+
+  return { tithi, event, isHoliday };
+};
+
+export const formatNepaliDateData = (
+  nepaliDate,
+  numeralSystem = 'nepali'
+) => {
+  const formattedYear = formatNumberBySystem(
+    nepaliDate.nepaliYear,
+    numeralSystem
+  );
+  const formattedMonth = NEPALI_MONTHS[nepaliDate.nepaliMonth - 1];
+  const formattedDay = formatNumberBySystem(
+    nepaliDate.nepaliDay,
+    numeralSystem
+  );
+  const formattedDayOfWeek = NEPALI_WEEKDAYS[nepaliDate.nepaliDayOfWeek - 1];
+
+  const { tithi, event, isHoliday } =
+    getTithiAndEventForNepaliDate(nepaliDate);
+
+  const { gregDate } = nepaliToGregorian(
+    nepaliDate.nepaliYear,
+    nepaliDate.nepaliMonth,
+    nepaliDate.nepaliDay
+  );
+
+  const englishFullDate = gregDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
 
   return {
     nepaliYear: formattedYear,
@@ -114,74 +327,49 @@ export const formatNepaliDateData = (nepaliDate) => {
     nepaliDay: formattedDay,
     nepaliDayOfWeek: formattedDayOfWeek,
     englishDate: nepaliDate.englishDate,
+    englishFullDate,
     nepaliTithi: tithi,
     nepaliEvent: event,
+    isHoliday,
   };
 };
 
-const calculateNepaliDateDifference = (dayDifference) => {
-  let yearOffset = 0,
-    monthOffset = 0,
-    startYear = '81',
-    stopLoop = false;
-  while (true) {
-    while (!stopLoop) {
-      if (dayDifference > nepaliCalendarData[startYear]['totalDays']) {
-        yearOffset++;
-        dayDifference -= nepaliCalendarData[startYear]['totalDays'];
-      } else {
-        for (
-          let i = 0;
-          i < nepaliCalendarData[startYear]['monthDays'].length;
-          i++
-        ) {
-          const daysInMonth = nepaliCalendarData[startYear]['monthDays'][i];
-          if (dayDifference >= daysInMonth) {
-            monthOffset++;
-            dayDifference -= daysInMonth;
-          } else {
-            stopLoop = true;
-            break;
-          }
-        }
+// Generates the label text for the GNOME Shell top panel
+export const formatTopBarText = (nepaliDate, settings) => {
+  const numeralSystem = settings
+    ? settings.get_string('numeral-system')
+    : 'nepali';
+  const format = settings ? settings.get_string('top-bar-format') : 'full';
+  const showDayOfWeek = settings
+    ? settings.get_boolean('show-day-of-week')
+    : true;
+  const showYear = settings ? settings.get_boolean('show-year') : false;
+
+  const dayStr = formatNumberBySystem(nepaliDate.nepaliDay, numeralSystem);
+  const monthStr = NEPALI_MONTHS[nepaliDate.nepaliMonth - 1];
+  const yearStr = formatNumberBySystem(nepaliDate.nepaliYear, numeralSystem);
+  const weekdayStr = NEPALI_WEEKDAYS[nepaliDate.nepaliDayOfWeek - 1];
+
+  let text = '';
+  switch (format) {
+    case 'date-only':
+      text = dayStr;
+      break;
+    case 'medium':
+      text = `${dayStr} ${monthStr}`;
+      break;
+    case 'full':
+    default:
+      text = `${dayStr} ${monthStr}`;
+      if (showDayOfWeek) {
+        text += ` (${weekdayStr})`;
       }
-      if (!stopLoop) {
-        startYear++;
-      }
-    }
-    return [yearOffset, monthOffset, dayDifference];
+      break;
   }
-};
 
-const adjustNepaliDate = (referenceDate, dateOffset) => {
-  let month;
-
-  for (let i = 0; i < referenceDate.length; i++) {
-    dateOffset[i] += referenceDate[i];
-    if (i === 1) {
-      if (dateOffset[i] >= 13) {
-        dateOffset[i] -= 12;
-        dateOffset[i - 1] += 1;
-      }
-      month = dateOffset[i];
-    }
+  if (showYear && format !== 'date-only') {
+    text = `${text} ${yearStr}`;
   }
-  return [dateOffset[0], month, dateOffset[2]];
-};
 
-const getTithiAndEventForNepaliDate = (nepaliDate) => {
-  const data = getYearDataFromCache(nepaliDate.nepaliYear);
-  let tithi = '-';
-  let event = '-';
-
-  if (data[nepaliDate.nepaliMonth - 1]) {
-    const dayData = data[nepaliDate.nepaliMonth - 1].days.find(
-      (d) => d.dayInEn === nepaliDate.nepaliDay.toString()
-    );
-    if (dayData) {
-      tithi = dayData.tithi || '-';
-      event = dayData.event || '-';
-    }
-  }
-  return { tithi, event };
+  return text;
 };
