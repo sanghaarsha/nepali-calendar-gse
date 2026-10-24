@@ -1,69 +1,62 @@
-# Nepali Calendar Gnome Shell Extension
-This is a gnome shell extension that shows Nepali calendar in the top bar of Gnome Shell. 
+# Nepali Calendar GNOME Shell Extension (`nepali-calendar-gse`)
 
+A modern GNOME Shell extension that provides a native Bikram Sambat (BS) Nepali calendar in the top panel with an interactive monthly calendar grid, dual English/Nepali dates, holiday and weekend highlights, and lunar Tithi details.
 
-## Screenshots
-![Screenshot](assets/nepali-calendar-gs-extension.png)
+> **Note**: This project is a fork of [PublisherName/nepali-calendar-gs-extension](https://github.com/PublisherName/nepali-calendar-gs-extension) maintained at [sanghaarsha/nepali-calendar-gse](https://github.com/sanghaarsha/nepali-calendar-gse).
+
+## Features
+
+- **Interactive Month Grid**: 7-column monthly view supporting Bikram Sambat years 2081 through 2085.
+- **Dual-Date Display**: Shows both Bikram Sambat date and secondary Gregorian date numbers in cells.
+- **Native GNOME Theme Fidelity**: Seamlessly adapts to light, dark, and custom themes (e.g., Catppuccin, Adwaita) and respects accent colors.
+- **Selected Day & Events Card**: Displays full Nepali/English date, lunar Tithi pill, public holiday badge (`सार्वजनिक बिदा`), and a list of festivals/events.
+- **Configurable Top Panel**: Full, medium, or date-only formats, with numeral style options (Nepali ०-९ or English 0-9).
+- **Libadwaita Preferences**: Modern settings window for customizing display, panel position, and calendar features.
 
 ## Installation
 
- [![Install on GNOME Shell](https://pbs.twimg.com/media/D6s8OS2U8AAaLNQ.png)](https://extensions.gnome.org/extension/7490/nepali-calendar/)
-
-
-
-## Manual Installation
-1. Clone this repository.
+### Manual Installation
+1. Clone this repository:
    ```bash
-    git clone git@github.com:PublisherName/nepali-calendar-gs-extension.git
-    ```
+   git clone git@github.com:sanghaarsha/nepali-calendar-gse.git
+   ```
 
-2. Change directory to the cloned repository.
-    ```bash
-    cd nepali-calendar-gs-extension
-    ```
-3. Run the following command to install the extension.
-    ```bash
-    ./install.sh
-    ```
-4. Restart Gnome Shell.
-    ```bash
-    Alt + F2
-    r
-    ```
-5. Enable the extension using Gnome Tweaks or Extensions application.
+2. Change directory into the repository:
+   ```bash
+   cd nepali-calendar-gse
+   ```
 
+3. Run the install script:
+   ```bash
+   ./install.sh
+   ```
 
-## Usage
-The extension shows the current Nepali date in the top bar of Gnome Shell. Clicking on the date will show the Nepali date and event for the current day.
+4. Enable the extension:
+   ```bash
+   gnome-extensions enable nepali-calendar-gse
+   ```
 
-# Code Formatting with ESLint and Prettier
+## Development & Packaging
 
-This project uses ESLint and Prettier to enforce consistent code formatting and style conventions, including single quotes and 2-space indentation.
+1. Install dependencies:
+   ```bash
+   uv sync
+   ```
 
-- Install esling and prettier
+2. Build extension zip:
+   ```bash
+   ./build.sh
+   ```
 
-    ```npm install eslint eslint-plugin-prettier```
+3. Validate with shexli:
+   ```bash
+   uv run shexli nepali-calendar-gse.zip
+   ```
 
-- Run eslint
-
-    ```npx eslint . --fix```
-
-## Testing
-
-1. Install dependency
-```bash
-uv sync
-```
-
-2. Build a zip
-```bash
-./build
-```
-
-3. Check the zip
-```bash
-uv run shexli nepali-calendar-gs-extension@subashghimire.info.np.zip
-```
+4. Open preferences:
+   ```bash
+   gnome-extensions prefs nepali-calendar-gse
+   ```
 
 ## License
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
