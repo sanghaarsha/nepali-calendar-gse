@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "nepali-calendar-gs-extension@subashghimire.info.np/**"
+      - "nepali-calendar@sanghaarsha.github.com/**"
       - "build.sh"
       - "pyproject.toml"
       - "uv.lock"
@@ -13,7 +13,7 @@ on:
     branches:
       - main
     paths:
-      - "nepali-calendar-gs-extension@subashghimire.info.np/**"
+      - "nepali-calendar@sanghaarsha.github.com/**"
       - "build.sh"
       - "pyproject.toml"
       - "uv.lock"
@@ -48,24 +48,24 @@ jobs:
       - name: Extract version from metadata.json
         id: extract_version
         run: |
-          VERSION=$(jq -r '.version' nepali-calendar-gs-extension@subashghimire.info.np/metadata.json)
+          VERSION=$(jq -r '.version' nepali-calendar@sanghaarsha.github.com/metadata.json)
           echo "release_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build extension zip
         run: ./build.sh
 
       - name: Verify zip exists
-        run: test -f nepali-calendar-gs-extension@subashghimire.info.np.zip
+        run: test -f nepali-calendar-gse.zip
 
       - name: Check zip file
-        run: uv run shexli nepali-calendar-gs-extension@subashghimire.info.np.zip
+        run: uv run shexli nepali-calendar-gse.zip
 
       - name: Upload zip artifact
         if: github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
           name: extension-zip
-          path: nepali-calendar-gs-extension@subashghimire.info.np.zip
+          path: nepali-calendar-gse.zip
 
   create-release:
     runs-on: ubuntu-latest
@@ -85,6 +85,6 @@ jobs:
           tag_name: v${{ needs.build-checks.outputs.release_version }}
           name: v${{ needs.build-checks.outputs.release_version }}
           body: "This release was automatically generated."
-          files: nepali-calendar-gs-extension@subashghimire.info.np.zip
+          files: nepali-calendar-gse.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

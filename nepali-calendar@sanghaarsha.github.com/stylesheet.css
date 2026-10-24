@@ -1,0 +1,133 @@
+/* Top Bar Panel Styling */
+.np-cal-panel-box {
+  spacing: 6px;
+}
+
+.np-cal-panel-icon {
+  icon-size: 16px;
+}
+
+.np-cal-top-bar-date-label {
+  font-weight: bold;
+}
+
+/* Custom Popup Item Wrapper */
+.np-cal-custom-popup-item,
+.np-cal-custom-popup-item.popup-menu-item {
+  padding: 0 !important;
+  background-color: transparent !important;
+}
+
+/* Modern Popup Container */
+.np-cal-popup-container {
+  padding: 12px 14px;
+  width: 275px;
+  spacing: 10px;
+}
+
+/* Header: Nepali Year & Month */
+.np-cal-year-month-label {
+  font-weight: 800;
+  font-size: 1.15em;
+  text-align: center;
+  color: inherit;
+}
+
+/* Libadwaita Hero Card */
+.np-cal-hero-card {
+  background-color: rgba(127, 127, 127, 0.1);
+  border-radius: 12px;
+  padding: 10px 12px;
+  spacing: 12px;
+}
+
+/* Left Date Tile */
+.np-cal-date-tile {
+  min-width: 54px;
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  background-color: #3584e4;
+  background-color: -st-accent-color;
+  color: #ffffff;
+  color: -st-accent-fg-color;
+}
+
+.np-cal-date-tile-holiday {
+  background-color: #e01b24;
+  color: #ffffff;
+}
+
+.np-cal-date-tile-number {
+  font-size: 1.95em;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* Right Details Column */
+.np-cal-details-col {
+  spacing: 2px;
+}
+
+.np-cal-weekday-label {
+  font-size: 1.05em;
+  font-weight: 700;
+}
+
+.np-cal-english-date-label {
+  font-size: 0.82em;
+}
+
+/* Status Badges Row (Holiday & Tithi) */
+.np-cal-status-row {
+  spacing: 6px;
+  margin-top: 3px;
+}
+
+.np-cal-badge {
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.74em;
+  font-weight: 600;
+}
+
+.np-cal-holiday-pill {
+  background-color: rgba(224, 27, 36, 0.16);
+  color: #f66151;
+}
+
+.np-cal-tithi-pill {
+  background-color: rgba(127, 127, 127, 0.18);
+  color: inherit;
+}
+
+.np-cal-holiday-text {
+  color: #f66151;
+}
+
+/* Subtle Divider */
+.np-cal-popup-divider {
+  height: 1px;
+  min-height: 1px;
+  background-color: rgba(127, 127, 127, 0.14);
+  margin: 2px 0;
+}
+
+/* Events & Festivals List */
+.np-cal-events-container {
+  spacing: 6px;
+  padding: 0 4px;
+}
+
+.np-cal-event-row {
+  spacing: 8px;
+}
+
+.np-cal-event-icon {
+  color: #3584e4;
+  color: -st-accent-color;
+}
+
+.np-cal-event-label {
+  font-size: 0.86em;
+}

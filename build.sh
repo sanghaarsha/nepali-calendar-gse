@@ -1,5 +1,7 @@
 #!/bin/bash
 
-cd nepali-calendar-gs-extension@subashghimire.info.np
+cd nepali-calendar@sanghaarsha.github.com
 
-zip -r ../nepali-calendar-gs-extension@subashghimire.info.np.zip *.js metadata.json stylesheet.css data/*.json utils/*.js schemas/*
+zip -r ../nepali-calendar@sanghaarsha.github.com.zip *.js metadata.json stylesheet.css data/*.json utils/*.js schemas/*.xml
+cp -f ../nepali-calendar@sanghaarsha.github.com.zip ../nepali-calendar-gse.zip
+

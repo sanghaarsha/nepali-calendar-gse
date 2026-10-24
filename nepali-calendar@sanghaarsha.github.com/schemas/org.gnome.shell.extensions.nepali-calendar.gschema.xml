@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.nepali-calendar" path="/org/gnome/shell/extensions/nepali-calendar/">
+    <key name="menu-position" type="s">
+      <default>'center'</default>
+      <summary>Position of the Nepali Calendar Menu</summary>
+      <description>Allows users to choose where the menu is placed on the panel ('left', 'center', 'right').</description>
+    </key>
+    <key name="top-bar-format" type="s">
+      <default>'full'</default>
+      <summary>Top bar date display format</summary>
+      <description>Format of the date in the top bar: 'full', 'medium', or 'date-only'.</description>
+    </key>
+    <key name="show-day-of-week" type="b">
+      <default>true</default>
+      <summary>Show day of week in top bar</summary>
+      <description>Whether to show the day of the week in the top bar indicator.</description>
+    </key>
+    <key name="show-year" type="b">
+      <default>false</default>
+      <summary>Show year in top bar</summary>
+      <description>Whether to show the Nepali year in the top bar indicator.</description>
+    </key>
+    <key name="numeral-system" type="s">
+      <default>'nepali'</default>
+      <summary>Numeral system</summary>
+      <description>Numeral system to use: 'nepali' (०-९) or 'english' (0-9).</description>
+    </key>
+    <key name="show-icon" type="b">
+      <default>false</default>
+      <summary>Show calendar icon in top bar</summary>
+      <description>Whether to show a calendar icon next to the date in the top bar.</description>
+    </key>
+    <key name="show-english-dates" type="b">
+      <default>true</default>
+      <summary>Show Gregorian date in popup</summary>
+      <description>Whether to show the Gregorian date in the popup card.</description>
+    </key>
+    <key name="highlight-holidays" type="b">
+      <default>true</default>
+      <summary>Highlight public holidays</summary>
+      <description>Whether to highlight public holidays and Saturdays in the popup card.</description>
+    </key>
+    <key name="show-tithi" type="b">
+      <default>true</default>
+      <summary>Show Tithi in popup</summary>
+      <description>Whether to show the Nepali lunar Tithi in the popup card.</description>
+    </key>
+    <key name="show-events" type="b">
+      <default>true</default>
+      <summary>Show events and festivals in popup</summary>
+      <description>Whether to show cultural events and festivals in the popup card.</description>
+    </key>
+  </schema>
+</schemalist>

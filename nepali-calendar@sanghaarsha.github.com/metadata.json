@@ -1,0 +1,16 @@
+{
+    "uuid": "nepali-calendar@sanghaarsha.github.com",
+    "name": "Nepali Calendar",
+    "description": "Shows Nepali date along with events and festivals.",
+    "url": "https://github.com/sanghaarsha/nepali-calendar-gse",
+    "shell-version": [
+        "46",
+        "47",
+        "48",
+        "49",
+        "50",
+        "51"
+    ],
+    "version": 17,
+    "settings-schema": "org.gnome.shell.extensions.nepali-calendar"
+}
